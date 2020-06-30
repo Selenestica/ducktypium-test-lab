@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head> </head>
+  <body>
+    <textarea class="form-control" id="msg_text" rows="11" name="msg_text">
+{{ msg_data.message }}</textarea
+    >
+    <input id="reply-time" type="hidden" name="reply_time" value="" />
+    <input id="reply-length" type="hidden" name="char_count" value="" />
+  </body>
+  <script>
+    let reply_time = 0;
+    let mouseStop = false,
+      typeStop = false;
+    let timerStarted = false;
+    window.onload = timer;
+
+    let timerVar = setInterval(() => {
+      timer();
+    }, 1000);
+
+    function timer() {
+      if (!timerStarted) {
+        reply_time += 1;
+        document.getElementById("reply-time").value = reply_time + " seconds";
+        document.getElementById("reply-display").innerHTML =
+          "Reply time: " + reply_time;
+        timerStarted = true;
+      }
+    }
+
+    function stopTimer() {
+      console.log(mouseStop, typeStop);
+      if (mouseStop && typeStop) {
+        clearInterval(timerVar);
+        timerStarted = false;
+      }
+    }
+
+    document.onmousemove = (function () {
+      if (!timerStarted) {
+        console.log("started");
+        setInterval(timerVar);
+      }
+      let onMouseStop = function () {
+          console.log("mouse has been still for 3 seconds");
+          mouseStop = true;
+          stopTimer();
+        },
+        thread;
+
+      return function () {
+        clearTimeout(thread);
+        thread = setTimeout(onMouseStop, 3000);
+      };
+    })();
+
+    let char_count = 0;
+    let replyBox = document.getElementById("msg_text");
+    replyBox.addEventListener("change", function () {
+      if (!timerStarted) {
+        console.log("started");
+        setInterval(timerVar);
+      }
+      char_count = replyBox.value.length;
+      document.getElementById("reply-length").value = char_count;
+      const stoppedTyping = setTimeout(detectTypeStop, 3000);
+    });
+
+    function detectTypeStop() {
+      if (char_count === replyBox.value.length) {
+        console.log("user has stopped typing");
+        typeStop = true;
+        stopTimer();
+      }
+    }
+  </script>
+</html>
