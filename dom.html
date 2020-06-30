@@ -29,7 +29,7 @@
     let mouseStop = false,
       typeStop = false;
     let replyBox = document.getElementById("msg_text");
-    window.onload = startTimer;
+    //window.onload = startTimer;
 
     function startTimer() {
       if (!timerVar) {
@@ -55,6 +55,9 @@
     document.onmousemove = (function () {
       let onMouseStop = function () {
           console.log("mouse has been still for 3 seconds");
+          if (char_count === 0) {
+            typeStop = true;
+          }
           mouseStop = true;
           stopTimer();
         },
