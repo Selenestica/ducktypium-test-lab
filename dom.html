@@ -1,47 +1,58 @@
 <!DOCTYPE html>
 <html>
-  <head> </head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  </head>
   <body>
-    <textarea class="form-control" id="msg_text" rows="11" name="msg_text">
-{{ msg_data.message }}</textarea
-    >
-    <input id="reply-time" type="hidden" name="reply_time" value="" />
-    <input id="reply-length" type="hidden" name="char_count" value="" />
+    <div id="main">
+      <div id="textarea-div">
+        <textarea
+          class="form-control"
+          id="msg_text"
+          rows="11"
+          name="msg_text"
+        ></textarea>
+      </div>
+      <div id="reply-div">
+        <p class="text-secondary" id="reply-display"></p>
+        <input id="reply-time" name="reply_time" value="" />
+        <input id="reply-length" name="char_count" value="" />
+      </div>
+    </div>
   </body>
   <script>
+    let timerVar;
     let reply_time = 0;
+    let char_count = 0;
     let mouseStop = false,
       typeStop = false;
-    let timerStarted = false;
-    window.onload = timer;
+    let replyBox = document.getElementById("msg_text");
+    window.onload = startTimer;
 
-    let timerVar = setInterval(() => {
-      timer();
-    }, 1000);
-
-    function timer() {
-      if (!timerStarted) {
-        reply_time += 1;
-        document.getElementById("reply-time").value = reply_time + " seconds";
-        document.getElementById("reply-display").innerHTML =
-          "Reply time: " + reply_time;
-        timerStarted = true;
+    function startTimer() {
+      if (!timerVar) {
+        timerVar = setInterval(timer, 1000);
       }
     }
 
+    function timer() {
+      reply_time += 1;
+      console.log(reply_time);
+      document.getElementById("reply-time").value = reply_time + " seconds";
+      document.getElementById("reply-display").innerHTML =
+        "Reply time: " + reply_time;
+    }
+
     function stopTimer() {
-      console.log(mouseStop, typeStop);
-      if (mouseStop && typeStop) {
+      if (timerVar && typeStop && mouseStop) {
         clearInterval(timerVar);
-        timerStarted = false;
+        timerVar = null;
       }
     }
 
     document.onmousemove = (function () {
-      if (!timerStarted) {
-        console.log("started");
-        setInterval(timerVar);
-      }
       let onMouseStop = function () {
           console.log("mouse has been still for 3 seconds");
           mouseStop = true;
@@ -55,20 +66,22 @@
       };
     })();
 
-    let char_count = 0;
-    let replyBox = document.getElementById("msg_text");
-    replyBox.addEventListener("change", function () {
-      if (!timerStarted) {
-        console.log("started");
-        setInterval(timerVar);
-      }
+    replyBox.addEventListener("mousemove", function () {
+      mouseStop = false;
+      startTimer();
+    });
+
+    replyBox.addEventListener("keypress", function () {
+      console.log("user started typing");
+      typeStop = false;
+      startTimer();
       char_count = replyBox.value.length;
       document.getElementById("reply-length").value = char_count;
-      const stoppedTyping = setTimeout(detectTypeStop, 3000);
+      setTimeout(detectTypeStop, 3000);
     });
 
     function detectTypeStop() {
-      if (char_count === replyBox.value.length) {
+      if (char_count + 1 === replyBox.value.length) {
         console.log("user has stopped typing");
         typeStop = true;
         stopTimer();

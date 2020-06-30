@@ -1,0 +1,9 @@
+* {
+  padding: 5px;
+}
+
+#textarea-div,
+#reply-div {
+  display: flex;
+  justify-content: center;
+}
